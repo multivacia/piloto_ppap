@@ -2,6 +2,7 @@ import { prisma } from "../../config/prisma.js";
 import { AppError } from "../../utils/AppError.js";
 import { assertPacoteVisivel } from "../pacotes/pacotes.service.js";
 import { isValidItemCode } from "./itemDefs.js";
+import { Prisma } from "@prisma/client";
 import type { ItemStatus, Role } from "@prisma/client";
 
 interface RequestUser {
@@ -61,13 +62,23 @@ async function mudarStatus(
   comentario: string | null,
   formData?: unknown
 ) {
+  // Prisma exige o sentinel Prisma.JsonNull (não o `null` do JS) para
+  // zerar um campo Json em update — daqui pra frente formData chega
+  // sempre num formato que o client aceita.
+  const formDataUpdate: Prisma.InputJsonValue | typeof Prisma.JsonNull | undefined =
+    formData === undefined
+      ? undefined
+      : formData === null
+        ? Prisma.JsonNull
+        : (formData as Prisma.InputJsonValue);
+
   return prisma.$transaction(async (tx) => {
     const atualizado = await tx.checklistItem.update({
       where: { id: itemId },
       data: {
         status: novoStatus,
         revisaoAtual: { increment: 1 },
-        ...(formData !== undefined ? { formData } : {}),
+        ...(formDataUpdate !== undefined ? { formData: formDataUpdate } : {}),
       },
     });
 
