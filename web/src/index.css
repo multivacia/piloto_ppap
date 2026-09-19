@@ -1,0 +1,75 @@
+:root {
+  --bg: #f5f6f8;
+  --ink: #1a1a1a;
+  --ink-soft: #6b7280;
+  --border: #e2e4e8;
+  --primary: #2f6fdb;
+  --danger: #d1453b;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); }
+
+.page { max-width: 880px; margin: 0 auto; padding: 20px 16px 60px; }
+.page-centered { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+
+.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.tag { font-size: 11px; background: #e8edfb; color: var(--primary); padding: 2px 8px; border-radius: 10px; }
+
+.card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+
+.field-label { display: block; font-size: 12px; color: var(--ink-soft); margin: 10px 0 4px; }
+.text-input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 14px; }
+
+.btn { border: none; border-radius: 6px; padding: 8px 14px; font-size: 14px; cursor: pointer; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--border); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.error-text { color: var(--danger); font-size: 13px; margin-top: 8px; }
+
+.tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.tab { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer; }
+.tab.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+.list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.pkg-grid { display: grid; gap: 12px; }
+.pkg-card { text-decoration: none; color: inherit; display: block; }
+.eyebrow { font-size: 12px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.04em; }
+.sub { font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+.empty-state { color: var(--ink-soft); padding: 24px 0; text-align: center; }
+
+.pkg-header { margin-bottom: 20px; }
+.meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 10px; }
+.meta-grid .k { font-size: 11px; color: var(--ink-soft); }
+.meta-grid .v { font-size: 14px; }
+.mono { font-variant-numeric: tabular-nums; }
+
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.item-row { border: 1px solid var(--border); border-radius: 8px; background: #fff; overflow: hidden; }
+.item-row-head {
+  width: 100%; display: flex; align-items: center; gap: 10px;
+  background: none; border: none; padding: 12px; cursor: pointer; text-align: left; font-size: 14px;
+}
+.item-code { font-weight: 700; color: var(--ink-soft); width: 22px; }
+.item-title { flex: 1; }
+.chev { color: var(--ink-soft); }
+.item-detail { padding: 0 14px 14px; border-top: 1px solid var(--border); }
+.action-block { margin: 12px 0; padding: 12px; background: #fafbfc; border-radius: 8px; }
+
+.history { margin-top: 14px; }
+.history-head { font-size: 12px; font-weight: 700; color: var(--ink-soft); margin-bottom: 6px; }
+.history-item { display: flex; gap: 10px; padding: 8px 0; border-top: 1px dashed var(--border); }
+.h-rev { font-size: 12px; color: var(--ink-soft); width: 50px; flex-shrink: 0; }
+.h-meta { font-size: 12px; color: var(--ink-soft); margin-top: 2px; }
+.h-comment { font-size: 13px; margin-top: 4px; }
+
+.anexos-list { margin-top: 12px; }
+.anexo-link { display: block; font-size: 13px; color: var(--primary); text-decoration: none; padding: 4px 0; }
+
+.modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal { width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; }
+.modal-foot { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }

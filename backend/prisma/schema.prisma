@@ -1,0 +1,151 @@
+// Schema do sistema de fluxo de aprovação PPAP.
+// Multi-tenant simples: um Usuario do tipo FORNECEDOR só enxerga os
+// Pacotes do seu próprio Fornecedor (aplicado sempre no backend, nunca
+// confiando em filtro feito no frontend). Usuarios AQF (F2J) enxergam tudo.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  FORNECEDOR
+  AQF
+}
+
+enum PacoteTipo {
+  FORNECEDOR // pacote vinculado a um fornecedor externo
+  CLIENTE    // pacote interno da F2J (sem fornecedor externo)
+}
+
+enum ItemStatus {
+  PENDENTE
+  ENVIADO
+  EM_ANALISE
+  APROVADO
+  APROVADO_CONDICIONAL
+  REPROVADO
+}
+
+model Fornecedor {
+  id        String   @id @default(cuid())
+  nome      String
+  local     String?
+  codigo    String?  @unique
+  createdAt DateTime @default(now())
+
+  usuarios Usuario[]
+  pacotes  Pacote[]
+
+  @@map("fornecedores")
+}
+
+model Usuario {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  nome         String
+  role         Role
+  ativo        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  // Preenchido apenas quando role = FORNECEDOR
+  fornecedorId String?
+  fornecedor   Fornecedor? @relation(fields: [fornecedorId], references: [id])
+
+  historico      HistoricoItem[]
+  anexos         Anexo[]
+  pacotesCriados Pacote[]        @relation("PacoteCriadoPor")
+
+  @@index([fornecedorId])
+  @@map("usuarios")
+}
+
+model Pacote {
+  id           String     @id @default(cuid())
+  pn           String
+  produto      String
+  tipo         PacoteTipo
+  nivelPpap    Int        @default(3)
+  compradorF2J String?
+  createdAt    DateTime   @default(now())
+
+  // Nulo quando tipo = CLIENTE (pacote interno da F2J)
+  fornecedorId String?
+  fornecedor   Fornecedor? @relation(fields: [fornecedorId], references: [id])
+
+  criadoPorId String
+  criadoPor   Usuario @relation("PacoteCriadoPor", fields: [criadoPorId], references: [id])
+
+  itens ChecklistItem[]
+
+  @@index([fornecedorId])
+  @@index([tipo])
+  @@map("pacotes")
+}
+
+// Uma linha por item do PPAP (1 a 18) dentro de um Pacote
+model ChecklistItem {
+  id           String @id @default(cuid())
+  pacoteId     String
+  pacote       Pacote @relation(fields: [pacoteId], references: [id], onDelete: Cascade)
+
+  itemCode     Int        // 1 a 18, ver src/modules/itens/itemDefs.ts
+  status       ItemStatus @default(PENDENTE)
+  revisaoAtual Int        @default(0)
+
+  // Campo livre para formulário estruturado (usado hoje pelo item 7 - Plano de Controle)
+  formData Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  historico HistoricoItem[]
+  anexos    Anexo[]
+
+  @@unique([pacoteId, itemCode])
+  @@index([pacoteId])
+  @@map("checklist_itens")
+}
+
+// Trilha de auditoria: toda mudança de status de um item vira uma entrada aqui
+model HistoricoItem {
+  id              String        @id @default(cuid())
+  checklistItemId String
+  checklistItem   ChecklistItem @relation(fields: [checklistItemId], references: [id], onDelete: Cascade)
+
+  revisao    Int
+  status     ItemStatus
+  comentario String?
+
+  autorId String
+  autor   Usuario @relation(fields: [autorId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([checklistItemId])
+  @@map("historico_itens")
+}
+
+model Anexo {
+  id              String        @id @default(cuid())
+  checklistItemId String
+  checklistItem   ChecklistItem @relation(fields: [checklistItemId], references: [id], onDelete: Cascade)
+
+  nomeOriginal String
+  caminho      String // caminho relativo dentro de UPLOADS_DIR, nunca exposto direto por URL
+  mimeType     String
+  tamanhoBytes Int
+
+  enviadoPorId String
+  enviadoPor   Usuario @relation(fields: [enviadoPorId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([checklistItemId])
+  @@map("anexos")
+}
