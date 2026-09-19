@@ -1,28 +1,11 @@
 import type { ItemStatus } from "../types";
-
-const LABELS: Record<ItemStatus, string> = {
-  PENDENTE: "Pendente",
-  ENVIADO: "Enviado",
-  EM_ANALISE: "Em análise",
-  APROVADO: "Aprovado",
-  APROVADO_CONDICIONAL: "Aprovado condicional",
-  REPROVADO: "Reprovado",
-};
-
-const CORES: Record<ItemStatus, string> = {
-  PENDENTE: "#8a8a8a",
-  ENVIADO: "#2f6fdb",
-  EM_ANALISE: "#c98a12",
-  APROVADO: "#1f9d55",
-  APROVADO_CONDICIONAL: "#b58900",
-  REPROVADO: "#d1453b",
-};
+import { STATUS_COLORS, STATUS_LABELS } from "../lib/statusColors";
 
 export function StatusBadge({ status }: { status: ItemStatus }) {
   return (
     <span
       style={{
-        background: CORES[status],
+        background: STATUS_COLORS[status],
         color: "#fff",
         borderRadius: 12,
         padding: "2px 10px",
@@ -31,7 +14,7 @@ export function StatusBadge({ status }: { status: ItemStatus }) {
         whiteSpace: "nowrap",
       }}
     >
-      {LABELS[status]}
+      {STATUS_LABELS[status]}
     </span>
   );
 }
